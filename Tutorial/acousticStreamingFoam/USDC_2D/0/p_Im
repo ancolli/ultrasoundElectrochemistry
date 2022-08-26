@@ -1,0 +1,76 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  9
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    location    "0";
+    object      p_Im;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 2 -2 0 0 0 0];
+
+internalField   uniform 1e-6;
+
+boundaryField
+{
+    "wall.*"
+    {
+    
+    	type            fixedValue;
+        value           uniform 1e-6;//$internalField;
+    }
+       
+    wall_cathode    
+    {  
+    
+    type            codedMixed;
+    
+    refValue        uniform 1e-6;
+    refGradient     uniform 1e-6;
+    valueFraction   uniform 0.11;
+
+    name    p_Im1;   // name of generated BC
+
+    code
+    #{      
+        this->refValue() = 0;//1e-6;
+        this->refGrad() = 0;//1e-6;
+        this->valueFraction() = 0.11;// (1-f)=0.89
+    #};
+ 
+    }
+       
+    wall_anode
+    {
+        type            fixedGradient;
+        gradient        uniform 3.2e5;//
+    }
+
+    inlet
+    {
+        type            fixedValue;
+        value           uniform 1e-6;//
+
+    }
+
+    outlet
+    {
+        type            fixedValue;
+        value           uniform 1e-6;//
+    }
+
+    frontAndBack
+    {
+        type            empty;     
+    }
+}
+
+// ************************************************************************* //

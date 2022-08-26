@@ -1,0 +1,135 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  9
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    "p_.*"
+    {
+        
+        preconditioner
+        {
+            preconditioner DIC;
+            tolerance      1e-08;//1e-08;
+            relTol         0.01;//0.5;//1e-08;
+            smoother       DICGaussSeidel;
+            cacheAgglomeration yes;
+        }
+              
+        solver           PBiCGStab;
+        smoother         DILU;
+        tolerance        1e-12;//1e-12;
+        relTol           0.01;//0.5;//1e-08;
+        minIter          1;
+        maxIter          1000;//1000;//5000
+        /*solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-12;
+        relTol          0.5;//0.01;//0.5;*/
+    }
+
+    "pcorr.*"
+    {
+        solver          GAMG;
+        smoother        DICGaussSeidel;
+        tolerance       0.1;
+        relTol          0;
+    }
+
+    p
+    {
+        $pcorr;
+        tolerance       1e-06;
+        relTol          0.01;
+    }
+
+    pFinal
+    {
+        $p;
+        relTol          0;
+    }
+
+    "(U|k|epsilon|omega)"
+    {
+         solver          smoothSolver;
+        smoother        symGaussSeidel;
+        tolerance       1e-6;
+        relTol          0;
+        minIter         1;
+        /*solver          PBiCGStab;
+        preconditioner  DILU;
+        tolerance       1e-06;
+        relTol          0.01;*/
+    }
+    
+     "(U|k|epsilon|omega)Final"
+    {
+        $U;
+        relTol          0;
+    }
+    
+    "C.*"
+    {
+        solver          PBiCGStab;//PBiCG;//
+        preconditioner  DILU;
+        tolerance       1e-07;
+        relTol          0;
+	minIter         1;
+    }
+}
+
+PIMPLE
+{
+    consistent          yes; //SIMPLEC
+    correctPhi          yes;
+    nOuterCorrectors    1;
+    nCorrectors         1;
+    nNonOrthogonalCorrectors 0;
+    
+    pRefCell        0.0;
+    pRefValue       0.0;
+    
+    /*outerCorrectorResidualControl
+    {
+        U
+        {
+                tolerance  1e-5;
+                relTol      0;
+        }
+        p
+        {
+                tolerance  5e-4;
+                relTol      0;
+        }
+    }*/
+}
+
+relaxationFactors
+{
+    fields
+    {
+        p       1;
+        //pFinal   1;
+    }
+    equations
+    {
+        //p_Re   .1;
+        //p_Im   .1;
+        ".*"            1.0;
+    }
+}
+
+// ************************************************************************* //
