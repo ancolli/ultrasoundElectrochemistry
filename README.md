@@ -1,4 +1,5 @@
 # v1.0.0
+Cite as: https://www.sciencedirect.com/science/article/pii/S1572665722010049 DOI: https://doi.org/10.1016/j.jelechem.2022.117011
 # acousticStreamingFoam
 Solver based on: https://github.com/blebon/acousticStreamingFoam by Bruno Lebon
 
